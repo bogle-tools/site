@@ -1,7 +1,7 @@
 @page "/3fund/{Funds}/{Year}/{AA}/{Intl}"
-@page "/3fund/{Year}/{AA}/{Intl}"
-@page "/3fund/{Year}/{AA}"
-@page "/3fund/{Year}"
+@page "/3fund/{Funds}/{Year}/{AA}"
+@page "/3fund/{Funds}/{Year}"
+@page "/3fund/{Funds}"
 @page "/3fund"
 @inject HttpClient Http
 
@@ -305,7 +305,20 @@ class App extends React.Component {
 
     @if (fundFamilies != null)
     {
-      var selectedFundFamily = fundFamilies.Where(ff=> ff.Name == Funds).ToList()[0];
+      Funds = Funds ?? "VanguardETF";
+      AA = AA ?? "70-30";
+      Intl = Intl ?? "20";
+      Year = Year ?? "All";
+
+      var sbAllocations = AA.Split('-');
+      double sAllocation = double.Parse(sbAllocations[0]) / 100;
+      double bAllocation = double.Parse(sbAllocations[1]) / 100;
+      double iAllocation = double.Parse(Intl) / 100;
+      Allocations[0] = sAllocation;
+      Allocations[1] = iAllocation;
+      Allocations[2] =  bAllocation;
+
+      var selectedFundFamily = fundFamilies.Where(ff=> ff.Name.ToLower() == Funds.ToLower()).ToList()[0];
       setTickers(selectedFundFamily);
       var selectedFundFamilyIndex = selectedFundFamily.Index;
       <div lang='en'>
@@ -334,35 +347,41 @@ class App extends React.Component {
                   Tickers[0] = fundFamily.StockFund;
                   Tickers[1] = fundFamily.InternationalStockFund;
                   Tickers[2] = fundFamily.BondFund;
+              }              
+              void toggleEditMode()
+              {
+                  EditMode = !EditMode;
               }
           }
 
           <div className='container'>
             <span className='allocation item item-1'>
-            @* Stocks: <span id='stockAlloc'>{this.state.allocations[0]*100}%</span> *@
+            Stocks: <span id='stockAlloc'>@(Allocations[0]*100)%</span>
             </span>
             <span className='item item-2'>
-              @* {this.state.editMode ? <input type="range" min="0" max="100" defaultValue={this.state.allocations[0]*100} onInput={(e)=>handleSlide(e,false)} onChange={(e)=>handleSlide(e,true)} /> : <span className='slash'>&nbsp;/&nbsp;</span> } *@
+              <input type="range" min="0" max="100" defaultValue=@(Allocations[0]*100)  />
+               <span className='slash'>&nbsp;/&nbsp;</span>
             </span>
             <span className='allocation item item-3'>
-              @* Bonds: <span id='bondAlloc'>{this.state.allocations[2]*100}%</span> *@
+              Bonds: <span id='bondAlloc'>@(Allocations[2]*100)%</span>
             </span>
             <br/>
             <span className='allocation'>
-            @* International: <span id='intlAlloc'>{this.state.allocations[1]*100}%</span> *@
+            International: <span id='intlAlloc'>@(Allocations[1]*100)%</span>
             </span>
             <span className='allocation'>
               @* {this.state.editMode ? <input type="range" min="0" max="100" defaultValue={this.state.allocations[1]*100} onInput={(e)=>handleIntlSlide(e,false)} onChange={(e)=>handleIntlSlide(e,true)} /> : false } *@
             </span>
-            @* <button className='editButton' onClick={(e)=>{toggleEditMode(e)}}>{this.state.editMode ? "save" : "edit"}</button> *@
+            <button className='editButton' onClick=@toggleEditMode>@(EditMode ? "save" : "edit")</button>
             @* <Chart type='line' id='chart' height='300' data={this.chartData} options={chartOptions} /> *@
           </div> 
-          @* {this.state.statusMessage !== null ? <h4 id='status'>{this.state.statusMessage}</h4> : null } *@
+          <h4>@StatusMessage</h4>
           <table>
             <tbody>
               <tr>
                 <td className='column'>
                   <table>
+          @* {this.state.statusMessage !== null ? <h4 id= *@
                     <thead>
                       <tr>
                         @* <th colSpan='2'><label><input defaultChecked={0===this.state.showYear} type='checkbox' name='check' year={0} className='yearButton' onClick={(e)=>this.changeYear(e)} />
@@ -371,7 +390,7 @@ class App extends React.Component {
                       </tr>
                     </thead>
                     <tbody>
-                        @* <>{this.showYears()}</> *@
+                        this.showYears()
                     </tbody>
                   </table>
                 </td>
@@ -379,11 +398,11 @@ class App extends React.Component {
                   <table>
                     <thead>
                       <tr>
-                        @* <th colSpan='2'>{this.state.showYear > 0 ? this.state.showYear : ""}</th> *@
+                        <th>this.state.showYear > 0 ? this.state.showYear : ""</th>
                       </tr>
                     </thead>
                     <tbody>
-                        @* <>{this.showMonths()}</> *@
+                        this.showMonths()
                     </tbody>
                   </table>
                 </td>
@@ -391,11 +410,11 @@ class App extends React.Component {
                   <table>
                     <thead>
                       <tr>
-                        @* <th colSpan='2'>{this.showDaysHeader()}</th> *@
+                        <th colSpan='2'>this.showDaysHeader()</th>
                       </tr>
                     </thead>
                     <tbody>
-                        @* <>{this.showDays()}</> *@
+                        this.showDays()
                     </tbody>
                   </table>
                 </td>
@@ -627,13 +646,16 @@ export default App; *@
     public string? Intl { get; set; }
     [Parameter]
     public string? Funds { get; set; }
-    public string[] Tickers = new string[3];
 
+    public bool EditMode { get; set; }
+    public double[] Allocations = new double[3];
+    public string[] Tickers = new string[3];
+    public string StatusMessage { get; set; } = "";
     public FundFamily[]? fundFamilies;
 
     protected override async Task OnInitializedAsync()
     {
-        Funds = Funds ?? "VanguardETF";
+
         fundFamilies = await FundFamily.GetFundFamilies(Http);
     } 
 }
