@@ -56,13 +56,13 @@ class App extends React.Component {
 
   setTickers ()
   {
-    this.state.tickers = null;
+    tickers = null;
     var eof = false;
     var i = 1;
     while (!eof) {
-      if (this.state.fundTypes[i][0] !== '') {
-        if (this.state.fundTypes[i][0].toUpperCase() === this.state.type.toUpperCase()) {
-          this.state.tickers = [this.state.fundTypes[i][1], this.state.fundTypes[i][2], this.state.fundTypes[i][3]];
+      if (fundTypes[i][0] !== '') {
+        if (fundTypes[i][0].toUpperCase() === type.toUpperCase()) {
+          tickers = [fundTypes[i][1], fundTypes[i][2], fundTypes[i][3]];
         }
 
         i++;
@@ -73,37 +73,37 @@ class App extends React.Component {
   }
 
   async loadFundInfo() {
-    this.state.monthlyQuotes = [null, null, null];
-    this.state.dailyQuotes = [null, null, null];
+    monthlyQuotes = [null, null, null];
+    dailyQuotes = [null, null, null];
 
     this.setTickers();
 
-    if (this.state.tickers === null) return null;
+    if (tickers === null) return null;
 
     var monthlyQuotePromises = [
-      this.toCsv("https://raw.githubusercontent.com/rrelyea/3fund-prices/main/data/MA_" + this.state.tickers[0] + ".csv"),
-      this.toCsv("https://raw.githubusercontent.com/rrelyea/3fund-prices/main/data/MA_" + this.state.tickers[1] + ".csv"),
-      this.toCsv("https://raw.githubusercontent.com/rrelyea/3fund-prices/main/data/MA_" + this.state.tickers[2] + ".csv")];
+      this.toCsv("https://raw.githubusercontent.com/rrelyea/3fund-prices/main/data/MA_" + tickers[0] + ".csv"),
+      this.toCsv("https://raw.githubusercontent.com/rrelyea/3fund-prices/main/data/MA_" + tickers[1] + ".csv"),
+      this.toCsv("https://raw.githubusercontent.com/rrelyea/3fund-prices/main/data/MA_" + tickers[2] + ".csv")];
     var dailyQuotePromises = [
-      this.toCsv("https://raw.githubusercontent.com/rrelyea/3fund-prices/main/data/D_" + this.state.tickers[0] + ".csv"),
-      this.toCsv("https://raw.githubusercontent.com/rrelyea/3fund-prices/main/data/D_" + this.state.tickers[1] + ".csv"),
-      this.toCsv("https://raw.githubusercontent.com/rrelyea/3fund-prices/main/data/D_" + this.state.tickers[2] + ".csv")];
+      this.toCsv("https://raw.githubusercontent.com/rrelyea/3fund-prices/main/data/D_" + tickers[0] + ".csv"),
+      this.toCsv("https://raw.githubusercontent.com/rrelyea/3fund-prices/main/data/D_" + tickers[1] + ".csv"),
+      this.toCsv("https://raw.githubusercontent.com/rrelyea/3fund-prices/main/data/D_" + tickers[2] + ".csv")];
 
-    this.state.monthlyQuotes = await Promise.all(monthlyQuotePromises);
-    this.state.dailyQuotes = await Promise.all(dailyQuotePromises);
+    monthlyQuotes = await Promise.all(monthlyQuotePromises);
+    dailyQuotes = await Promise.all(dailyQuotePromises);
 
-    this.state.indexes = [1,1,1];
-    if (this.state.monthlyQuotes[0] !== null) {
+    indexes = [1,1,1];
+    if (monthlyQuotes[0] !== null) {
       var loop = true;
       while (loop) {
-        if (this.state.monthlyQuotes[0][this.state.indexes[0]].length === 1 
-          || this.state.monthlyQuotes[1][this.state.indexes[1]].length === 1 
-          || this.state.monthlyQuotes[2][this.state.indexes[2]].length === 1) {
+        if (monthlyQuotes[0][indexes[0]].length === 1 
+          || monthlyQuotes[1][indexes[1]].length === 1 
+          || monthlyQuotes[2][indexes[2]].length === 1) {
             loop = false;
         } else {
-          var s = this.state.monthlyQuotes[0][this.state.indexes[0]][0];
-          var sI = this.state.monthlyQuotes[1][this.state.indexes[1]][0];
-          var b = this.state.monthlyQuotes[2][this.state.indexes[2]][0];
+          var s = monthlyQuotes[0][indexes[0]][0];
+          var sI = monthlyQuotes[1][indexes[1]][0];
+          var b = monthlyQuotes[2][indexes[2]][0];
     
           var max;
           if (s < sI) {
@@ -115,21 +115,21 @@ class App extends React.Component {
             max = b;
           }
           
-          if (s < max) this.state.indexes[0] = this.state.indexes[0] + 1;
-          if (sI < max) this.state.indexes[1] = this.state.indexes[1] + 1;
-          if (b < max) this.state.indexes[2] = this.state.indexes[2] + 2;
+          if (s < max) indexes[0] = indexes[0] + 1;
+          if (sI < max) indexes[1] = indexes[1] + 1;
+          if (b < max) indexes[2] = indexes[2] + 2;
     
           if (s === sI && sI === b) {
-            var date = this.state.monthlyQuotes[0][this.state.indexes[0]][0];
-            this.state.startYear = parseInt(date.substr(0,4));
-            this.state.startMonth = parseInt(date.substr(5,2));
+            var date = monthlyQuotes[0][indexes[0]][0];
+            startYear = parseInt(date.substr(0,4));
+            startMonth = parseInt(date.substr(5,2));
             loop = false;
           }
         }
       }
-      this.state.statusMessage = null;
+      statusMessage = null;
     } else {
-      this.state.statusMessage = "No data found";
+      statusMessage = "No data found";
     }
 
     this.setState(this.state);
@@ -149,13 +149,13 @@ class App extends React.Component {
     var sAllocation = parseInt(sbAllocations[0]) / 100;
     var bAllocation = parseInt(sbAllocations[1]) / 100;
     var iAllocation = intlAlloc !== null ? parseInt(intlAlloc) / 100 : 0;
-    this.state.allocations = [sAllocation,iAllocation,bAllocation];
+    allocations = [sAllocation,iAllocation,bAllocation];
 
     if (commit) {
       const params = new URLSearchParams(window.location.search);
 
-      if (this.state.type !== "VanguardETF") {
-        params.set('type', this.state.type);
+      if (type !== "VanguardETF") {
+        params.set('type', type);
       } else {
         if (params.has('type')) params.delete('type');
       }
@@ -178,7 +178,7 @@ class App extends React.Component {
         window.history.replaceState({}, "", `${window.location.pathname}`);
       }
     }
-    this.setState(this.state.allocations);
+    this.setState(allocations);
   }
 
   getParam(params, paramName, defaultValue) {
@@ -195,17 +195,17 @@ class App extends React.Component {
 
   async harvestParams () {
     const params = new URLSearchParams(window.location.search);
-    this.state.type = this.getParam(params, 'type', 'VanguardETF');
-    this.state.showYear = Number(this.getParam(params, 'year', this.state.showYear));
+    type = this.getParam(params, 'type', 'VanguardETF');
+    showYear = Number(this.getParam(params, 'year', showYear));
     var fundTypesPromise = this.toCsv("https://raw.githubusercontent.com/rrelyea/3fund-prices/main/data/fundTypes.csv");
-    this.state.fundTypes = await fundTypesPromise;
+    fundTypes = await fundTypesPromise;
     this.harvestAllocations();
   }
 
   setParams() {
     var params = new URLSearchParams(window.location.search);
-    this.setParam(this.state.type, params, 'type', 'VanguardETF');
-    this.setParam(this.state.showYear, params, 'year', 0);
+    this.setParam(type, params, 'type', 'VanguardETF');
+    this.setParam(showYear, params, 'year', 0);
     if (Array.from(params).length > 0) {
       window.history.replaceState({}, "", `${window.location.pathname}?${params.toString()}`);
     } else {
@@ -227,12 +227,12 @@ class App extends React.Component {
     var checkbox = e.target;
     var year = checkbox.getAttribute('year');
     var checked = checkbox.checked;
-    this.state.showYear = checked ? Number(year) : 0
+    showYear = checked ? Number(year) : 0
 
     // clear all checkboxes except for latest clickced
     var checkboxes = document.getElementsByName('check')
     checkboxes.forEach((item) => {
-        item.checked = Number(item.getAttribute('year')) === this.state.showYear;
+        item.checked = Number(item.getAttribute('year')) === showYear;
     });
 
     this.setParams();
@@ -242,7 +242,7 @@ class App extends React.Component {
 
   render () {
     const handleChange = (e) => {
-      this.state.type = e.target.value;
+      type = e.target.value;
       this.setParams();
       this.loadFundInfo();
       this.render();
@@ -255,28 +255,28 @@ class App extends React.Component {
       var bond = 100 - stock;
       stockAlloc.innerText = e.target.value + '%';
       bondAlloc.innerText = 100 - e.target.value + '%';
-      var i = this.state.allocations[1] * 100;
+      var i = allocations[1] * 100;
       this.setAllocations(stock, i, bond, true);
     }
 
     const handleIntlSlide = (e) => {
       var intlAlloc = document.getElementById('intlAlloc');
       intlAlloc.innerText = e.target.value + '%';
-      var s = this.state.allocations[0] * 100;
-      var b = this.state.allocations[2] * 100;
+      var s = allocations[0] * 100;
+      var b = allocations[2] * 100;
       this.setAllocations(s.toString(), e.target.value, b.toString(), false);
     }
     
     const toggleEditMode = (e) => {
-      this.state.editMode = !this.state.editMode;
+      editMode = !editMode;
 
-      if (!this.state.editMode) {
+      if (!editMode) {
         var stockAlloc = document.getElementById('stockAlloc');
         var bondAlloc = document.getElementById('bondAlloc');
 
         var stock = Number(stockAlloc.innerText.substring(0, stockAlloc.innerText.length - 1));
         var bond = Number(bondAlloc.innerText.substring(0, bondAlloc.innerText.length - 1));
-        var i = this.state.allocations[1] * 100;
+        var i = allocations[1] * 100;
         this.setAllocations(stock, i, bond, true);
       }
 
@@ -301,7 +301,7 @@ class App extends React.Component {
             }
           };
 
-    return  (this.state.monthlyQuotes !== null) &&  *@
+    return  (monthlyQuotes !== null) &&  *@
 
     @if (fundFamilies != null)
     {
@@ -342,11 +342,21 @@ class App extends React.Component {
                   setTickers(fundFamily);
               }
 
-              void setTickers(FundFamily fundFamily)
+              async void setTickers(FundFamily fundFamily)
               {
                   Tickers[0] = fundFamily.StockFund;
                   Tickers[1] = fundFamily.InternationalStockFund;
                   Tickers[2] = fundFamily.BondFund;
+
+                  monthlyQuotes = new Array[3];
+                  monthlyQuotes[0] = await MonthlyQuotes.GetMonthlyQuotesAsync(Http,"https://raw.githubusercontent.com/rrelyea/3fund-prices/main/data/MA_" + Tickers[0] + ".csv");
+                  monthlyQuotes[1] = await MonthlyQuotes.GetMonthlyQuotesAsync(Http,"https://raw.githubusercontent.com/rrelyea/3fund-prices/main/data/MA_" + Tickers[1] + ".csv");
+                  monthlyQuotes[2] = await MonthlyQuotes.GetMonthlyQuotesAsync(Http,"https://raw.githubusercontent.com/rrelyea/3fund-prices/main/data/MA_" + Tickers[2] + ".csv");
+
+                  dailyQuotes = new Array[3];
+                  dailyQuotes[0] = await DailyQuotes.GetDailyQuotesAsync(Http,"https://raw.githubusercontent.com/rrelyea/3fund-prices/main/data/D_" + Tickers[0] + ".csv");
+                  dailyQuotes[1] = await DailyQuotes.GetDailyQuotesAsync(Http,"https://raw.githubusercontent.com/rrelyea/3fund-prices/main/data/D_" + Tickers[1] + ".csv");
+                  dailyQuotes[2] = await DailyQuotes.GetDailyQuotesAsync(Http,"https://raw.githubusercontent.com/rrelyea/3fund-prices/main/data/D_" + Tickers[2] + ".csv");
               }              
               void toggleEditMode()
               {
@@ -370,7 +380,7 @@ class App extends React.Component {
             International: <span id='intlAlloc'>@(Allocations[1]*100)%</span>
             </span>
             <span className='allocation'>
-              @* {this.state.editMode ? <input type="range" min="0" max="100" defaultValue={this.state.allocations[1]*100} onInput={(e)=>handleIntlSlide(e,false)} onChange={(e)=>handleIntlSlide(e,true)} /> : false } *@
+              @* {editMode ? <input type="range" min="0" max="100" defaultValue={allocations[1]*100} onInput={(e)=>handleIntlSlide(e,false)} onChange={(e)=>handleIntlSlide(e,true)} /> : false } *@
             </span>
             <button className='editButton' onClick=@toggleEditMode>@(EditMode ? "save" : "edit")</button>
             @* <Chart type='line' id='chart' height='300' data={this.chartData} options={chartOptions} /> *@
@@ -381,10 +391,10 @@ class App extends React.Component {
               <tr>
                 <td className='column'>
                   <table>
-          @* {this.state.statusMessage !== null ? <h4 id= *@
+                    @* {statusMessage !== null ? <h4 id= *@
                     <thead>
                       <tr>
-                        @* <th colSpan='2'><label><input defaultChecked={0===this.state.showYear} type='checkbox' name='check' year={0} className='yearButton' onClick={(e)=>this.changeYear(e)} />
+                        @* <th colSpan='2'><label><input defaultChecked={0===showYear} type='checkbox' name='check' year={0} className='yearButton' onClick={(e)=>this.changeYear(e)} />
                                 <span className='year'>All Years</span></label>
                         </th> *@
                       </tr>
@@ -398,7 +408,7 @@ class App extends React.Component {
                   <table>
                     <thead>
                       <tr>
-                        <th>this.state.showYear > 0 ? this.state.showYear : ""</th>
+                        <th>showYear > 0 ? showYear : ""</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -467,89 +477,26 @@ class App extends React.Component {
     return change;
   }
 
-  showYears () {
-    if (this.state.monthlyQuotes[0] === null) return null;
-    if (this.state.allocations === undefined) return null;
-
-    var assetStock = this.state.allocations[0];
-    var assetStockIntl = this.state.allocations[1];
-    var assetBond = this.state.allocations[2];
-    var runningTotal = 10000;
-    var eoyLabelAndDataAdded = false;
-
-    var years = Array(this.state.currentYear - this.state.startYear);
-    var labels = Array(this.state.currentYear - this.state.startYear + 2);
-    var data = Array(this.state.currentYear - this.state.startYear + 2);
-
-    for (var year = this.state.startYear; year <= this.state.currentYear; year++) {
-      var endMonth = year === this.state.currentYear ? this.state.currentMonth : 12;
-      var startMonth = year === this.state.startYear ? this.state.startMonth + 1 : 1;
-      var delta1 = this.getChange(this.state, year, startMonth, year, endMonth, 0);
-      if (isNaN(delta1)) {
-        endMonth = endMonth - 1;
-        delta1 = this.getChange(this.state, year, startMonth, year, endMonth, 0);
-      }
-      var delta2 = this.getChange(this.state, year, startMonth, year, endMonth, 1);
-      var delta3 = this.getChange(this.state, year, startMonth, year, endMonth, 2);
-      var composite = (assetStock * 100 * (1-assetStockIntl)) * delta1 + 
-        (assetStock * 100 * (assetStockIntl)) * delta2 + 
-        (assetBond * 100 * delta3);
-      composite = delta1 === null || delta2 === null || delta3 === null ? null : composite;
-      years[this.state.currentYear - year + 1] = new Array(2);
-      years[this.state.currentYear - year + 1][0] = year;
-      years[this.state.currentYear - year + 1][1] = composite;
-
-      if (!eoyLabelAndDataAdded) {
-        labels[year - this.state.startYear] = this.state.startYear - 1;
-        data[year - this.state.startYear] = runningTotal;
-        eoyLabelAndDataAdded = true;
-      }
-      
-      labels[year - this.state.startYear + 1] = year;
-      runningTotal = runningTotal * (100.0+Number(composite))/100.0;
-      data[year - this.state.startYear + 1] = runningTotal;
-    }
-
-    if (this.state.showYear === 0) {
-      this.chartData.labels = labels;
-      this.chartData.datasets = [{
-        data:data,
-        label: this.state.startYear.toString() + " - " + this.state.currentYear.toString(),
-        borderColor: '#3e95cd',
-        backgroundColor: '#7bb6dd',
-        fill: false,
-      }];
-    }
-
-    return years.map( (period, index) => <tr key={index}>
-        <td>
-          <label>
-          <input name='check' defaultChecked={period[0]===this.state.showYear} year={period[0]} type='checkbox' className='yearButton' onClick={(e)=>this.changeYear(e)} />
-            <span className='year'>{period[0]}</span>
-          </label>
-        </td>
-        <td className='value'>{Number(period[1]).toFixed(1)+"%"}</td>
-      </tr> );
-  }
+  
 
   showMonths () {
-    if (this.state.showYear === 0) return null;
-    if (this.state.monthlyQuotes[0] === null) return null;
-    if (this.state.allocations === undefined) return null;
+    if (showYear === 0) return null;
+    if (monthlyQuotes[0] === null) return null;
+    if (allocations === undefined) return null;
 
-    var assetStock = this.state.allocations[0];
-    var assetStockIntl = this.state.allocations[1];
-    var assetBond = this.state.allocations[2];
-    var showMonth = this.state.showYear === this.state.currentYear ? this.state.currentMonth : 12;
+    var assetStock = allocations[0];
+    var assetStockIntl = allocations[1];
+    var assetBond = allocations[2];
+    var showMonth = showYear === currentYear ? currentMonth : 12;
     var months = Array(showMonth);
     var labels = Array(showMonth + 1);
     var data = Array(showMonth + 1);
     var runningTotal = 10000;
     var eoyLabelAndDataAdded = false;
     for (var month = 1; month <= showMonth; month++) {
-      var delta1 = this.getChange(this.state, this.state.showYear, month, this.state.showYear, month, 0);
-      var delta2 = this.getChange(this.state, this.state.showYear, month, this.state.showYear, month, 1);
-      var delta3 = this.getChange(this.state, this.state.showYear, month, this.state.showYear, month, 2);
+      var delta1 = this.getChange(this.state, showYear, month, showYear, month, 0);
+      var delta2 = this.getChange(this.state, showYear, month, showYear, month, 1);
+      var delta3 = this.getChange(this.state, showYear, month, showYear, month, 2);
       if (delta1 !== null && delta2 !== null && delta3 !== null) {
         var composite = (assetStock * 100 * (1-assetStockIntl)) * delta1 + 
           (assetStock * 100 * (assetStockIntl)) * delta2 + 
@@ -573,7 +520,7 @@ class App extends React.Component {
     this.chartData.labels = labels;
     this.chartData.datasets = [{
       data:data,
-      label: this.state.showYear,
+      label: showYear,
       borderColor: '#3e95cd',
       backgroundColor: '#7bb6dd',
       fill: false,
@@ -582,52 +529,52 @@ class App extends React.Component {
     return months.map( (period, index) => period[1] === "---" ? false : <tr key={index}><td>{period[0]}</td><td className='value'>{period[1]}</td></tr> );
   }
 
-  days = Array(this.state.currentMonth);
+  days = Array(currentMonth);
   showDaysHeader () {
     this.calculateDays();
-    if (this.state.currentYear === this.state.showYear) {
-      var month = this.state.currentMonth - 1;
+    if (currentYear === showYear) {
+      var month = currentMonth - 1;
       if (this.days[0][0] > new Date().getDay()) {
         month = month - 1;
       }
       
-      return this.month_names_short[month] + " " + this.state.currentYear;
+      return this.month_names_short[month] + " " + currentYear;
     }
     else
       return false;
   }
 
   calculateDays () {  
-    if (this.state.showYear !== this.state.currentYear ||
-      this.state.monthlyQuotes[0] === null ||
-      this.state.allocations === undefined) {
+    if (showYear !== currentYear ||
+      monthlyQuotes[0] === null ||
+      allocations === undefined) {
         return;
     }
 
-    this.days = Array(this.state.currentMonth);
-    var assetStock = this.state.allocations[0];
-    var assetStockIntl = this.state.allocations[1];
-    var assetBond = this.state.allocations[2];
-    var dayCount = this.state.dailyQuotes[0].length - 2;
+    this.days = Array(currentMonth);
+    var assetStock = allocations[0];
+    var assetStockIntl = allocations[1];
+    var assetBond = allocations[2];
+    var dayCount = dailyQuotes[0].length - 2;
 
     for (var dayIndex = dayCount; dayIndex >= 1 ; dayIndex--) {
-      var delta1 = this.getDayChange(this.state, this.state.currentYear, this.state.currentMonth, dayIndex, 0);
-      var delta2 = this.getDayChange(this.state, this.state.currentYear, this.state.currentMonth, dayIndex, 1);
-      var delta3 = this.getDayChange(this.state, this.state.currentYear, this.state.currentMonth, dayIndex, 2);
+      var delta1 = this.getDayChange(this.state, currentYear, currentMonth, dayIndex, 0);
+      var delta2 = this.getDayChange(this.state, currentYear, currentMonth, dayIndex, 1);
+      var delta3 = this.getDayChange(this.state, currentYear, currentMonth, dayIndex, 2);
       var composite = (assetStock * 100 * (1-assetStockIntl)) * delta1 + 
         (assetStock * 100 * (assetStockIntl)) * delta2 + 
         (assetBond * 100 * delta3);
       composite = delta1 == null || delta2 == null || delta3 == null ? null : composite;
       this.days[dayCount - dayIndex] = new Array(2);
-      this.days[dayCount - dayIndex][0] = this.state.dailyQuotes[0][dayIndex][0].substr(8);
+      this.days[dayCount - dayIndex][0] = dailyQuotes[0][dayIndex][0].substr(8);
       this.days[dayCount - dayIndex][1] = composite;
     }
   }
 
   showDays () {
-    if (this.state.showYear !== this.state.currentYear ||
-      this.state.monthlyQuotes[0] === null ||
-      this.state.allocations === undefined) {
+    if (showYear !== currentYear ||
+      monthlyQuotes[0] === null ||
+      allocations === undefined) {
         return <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td></tr>;
     }
 
@@ -638,6 +585,71 @@ class App extends React.Component {
 export default App; *@
 
 @code {
+
+    @* void showYears() {
+      if (monthlyQuotes[0] === null) return null;
+
+      var assetStock = Allocations[0];
+      var assetStockIntl = Allocations[1];
+      var assetBond = Allocations[2];
+      var runningTotal = 10000;
+      var eoyLabelAndDataAdded = false;
+
+      var years = new Array[currentYear - startYear];
+      var labels = new Array[currentYear - startYear + 2];
+      var data = new Array[currentYear - startYear + 2];
+
+      for (var year = startYear; year <= currentYear; year++) {
+        var endMonth = year === currentYear ? currentMonth : 12;
+        var startMonth = year === startYear ? startMonth + 1 : 1;
+        var delta1 = this.getChange(this.state, year, startMonth, year, endMonth, 0);
+        if (isNaN(delta1)) {
+          endMonth = endMonth - 1;
+          delta1 = this.getChange(this.state, year, startMonth, year, endMonth, 0);
+        }
+        var delta2 = this.getChange(this.state, year, startMonth, year, endMonth, 1);
+        var delta3 = this.getChange(this.state, year, startMonth, year, endMonth, 2);
+        var composite = (assetStock * 100 * (1-assetStockIntl)) * delta1 + 
+          (assetStock * 100 * (assetStockIntl)) * delta2 + 
+          (assetBond * 100 * delta3);
+        composite = delta1 === null || delta2 === null || delta3 === null ? null : composite;
+        years[currentYear - year + 1] = new Array(2);
+        years[currentYear - year + 1][0] = year;
+        years[currentYear - year + 1][1] = composite;
+
+        if (!eoyLabelAndDataAdded) {
+          labels[year - startYear] = startYear - 1;
+          data[year - startYear] = runningTotal;
+          eoyLabelAndDataAdded = true;
+        }
+        
+        labels[year - startYear + 1] = year;
+        runningTotal = runningTotal * (100.0+Number(composite))/100.0;
+        data[year - startYear + 1] = runningTotal;
+      }
+
+      if (showYear === 0) {
+        this.chartData.labels = labels;
+        this.chartData.datasets = [{
+          data:data,
+          label: startYear.toString() + " - " + currentYear.toString(),
+          borderColor: '#3e95cd',
+          backgroundColor: '#7bb6dd',
+          fill: false,
+        }];
+      }
+
+      return years.map( (period, index) => <tr key={index}>
+          <td>
+            <label>
+            <input name='check' defaultChecked={period[0]===showYear} year={period[0]} type='checkbox' className='yearButton' onClick={(e)=>this.changeYear(e)} />
+              <span className='year'>{period[0]}</span>
+            </label>
+          </td>
+          <td className='value'>{Number(period[1]).toFixed(1)+"%"}</td>
+        </tr> );
+    } *@
+    
     [Parameter]
     public string? Year { get; set; }
     [Parameter]
@@ -652,10 +664,10 @@ export default App; *@
     public string[] Tickers = new string[3];
     public string StatusMessage { get; set; } = "";
     public FundFamily[]? fundFamilies;
-
+    public Array[]? monthlyQuotes;
+    public Array[]? dailyQuotes;
     protected override async Task OnInitializedAsync()
     {
-
         fundFamilies = await FundFamily.GetFundFamilies(Http);
     } 
 }
